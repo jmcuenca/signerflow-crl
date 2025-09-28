@@ -91,6 +91,7 @@ func setupRouter(handler *handlers.CertificateHandler) *gin.Engine {
 		certificates := v1.Group("/certificates")
 		{
 			certificates.GET("/check/:serial", handler.CheckCertificate)
+			certificates.GET("/valid/:serial", handler.ValidCertificate)
 			certificates.GET("/details/:serial", handler.GetCertificateDetails)
 		}
 
@@ -106,11 +107,11 @@ func setupRouter(handler *handlers.CertificateHandler) *gin.Engine {
 			"version":     "1.0.0",
 			"description": "Servicio de verificación de certificados revocados",
 			"endpoints": gin.H{
-				"health":           "/api/v1/health",
-				"stats":            "/api/v1/stats",
-				"check_certificate": "/api/v1/certificates/check/:serial",
+				"health":              "/api/v1/health",
+				"stats":               "/api/v1/stats",
+				"check_certificate":   "/api/v1/certificates/check/:serial",
 				"certificate_details": "/api/v1/certificates/details/:serial",
-				"force_refresh":    "/api/v1/admin/refresh",
+				"force_refresh":       "/api/v1/admin/refresh",
 			},
 		})
 	})

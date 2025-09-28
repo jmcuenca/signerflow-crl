@@ -51,6 +51,37 @@ func (h *CertificateHandler) CheckCertificate(c *gin.Context) {
 
 	c.JSON(http.StatusOK, status)
 }
+func (h *CertificateHandler) ValidCertificate(c *gin.Context) {
+	serial := c.Param("serial")
+	if serial == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Serial requerido",
+			"message": "Debe proporcionar el número de serie del certificado",
+		})
+		return
+	}
+
+	serial = strings.ToUpper(strings.TrimSpace(serial))
+
+	if h.redis != nil {
+		h.redis.IncrementStats("stats:requests_total")
+	}
+
+	status, err := h.crlService.CheckCertificateStatus(serial)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Error interno del servidor",
+			"message": "Error al verificar el estado del certificado",
+		})
+		return
+	}
+	if status.IsRevoked {
+		c.String(http.StatusOK, status.RevocationDate.Format("2006-01-02T15:04:05"))
+	} else {
+		c.String(http.StatusOK, "")
+	}
+
+}
 
 func (h *CertificateHandler) GetHealth(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{

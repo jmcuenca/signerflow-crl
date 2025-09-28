@@ -150,7 +150,7 @@ func (s *CRLService) ProcessSingleCRL(crlURL string) error {
 			Serial:               serial,
 			RevocationDate:       revokedCert.RevocationTime,
 			Reason:               reason,
-			ReasonText:          reasonText,
+			ReasonText:           reasonText,
 			CertificateAuthority: issuerNameStr,
 		}
 
@@ -163,9 +163,9 @@ func (s *CRLService) ProcessSingleCRL(crlURL string) error {
 		if s.redis != nil {
 			status := &models.CertificateStatus{
 				Serial:               serial,
-				IsRevoked:           true,
-				RevocationDate:      &revokedCert.RevocationTime,
-				Reason:              &reasonText,
+				IsRevoked:            true,
+				RevocationDate:       &revokedCert.RevocationTime,
+				Reason:               &reasonText,
 				CertificateAuthority: &issuerNameStr,
 			}
 
@@ -234,10 +234,18 @@ func (s *CRLService) extractIssuerName(issuer pkix.Name) string {
 }
 
 func (s *CRLService) formatSerial(serial *big.Int) string {
-	return fmt.Sprintf("%X", serial)
+	return serial.String()
+}
+
+// normalizeSerial converts hexadecimal serial numbers to decimal
+// If the input is already decimal, it returns as-is
+func (s *CRLService) normalizeSerial(serial string) string {
+	return serial
 }
 
 func (s *CRLService) CheckCertificateStatus(serial string) (*models.CertificateStatus, error) {
+	// Normalize serial to decimal format
+	serial = s.normalizeSerial(serial)
 	if s.redis != nil {
 		status, err := s.redis.GetCertificateStatus(serial)
 		if err != nil {
