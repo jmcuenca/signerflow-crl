@@ -1,0 +1,56 @@
+# Binarios
+main
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Archivos de prueba
+*.test
+*.env
+# Cache Go
+*.out
+
+# Dependencias
+vendor/
+node_modules/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Variables de entorno (mantener .env como ejemplo)
+.env.local
+.env.production
+
+# Logs
+*.log
+logs/
+
+# Base de datos local
+*.db
+*.sqlite
+
+# Cache de aplicación
+tmp/
+cache/
+
+# Docker
+docker-data/
+
+# Archivos de certificados temporales
+*.crt
+*.pem
+*.key
+*.crl
+
+# Archivos de respaldo
+*.bak
+*.backup
