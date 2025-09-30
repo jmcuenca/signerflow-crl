@@ -1,8 +1,6 @@
-module github.com/signerflow/crl-service
+module signerflow-crl
 
 go 1.21
-
-replace github.com/signerflow/crl-service => ./
 
 require (
 	github.com/gin-gonic/gin v1.10.0

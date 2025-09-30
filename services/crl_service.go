@@ -14,9 +14,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/signerflow/crl-service/cache"
-	"github.com/signerflow/crl-service/database"
-	"github.com/signerflow/crl-service/models"
+	"signerflow-crl/cache"
+	"signerflow-crl/database"
+	"signerflow-crl/models"
 )
 
 type CRLService struct {

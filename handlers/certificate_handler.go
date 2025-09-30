@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/signerflow/crl-service/cache"
-	"github.com/signerflow/crl-service/database"
-	"github.com/signerflow/crl-service/services"
+	"signerflow-crl/cache"
+	"signerflow-crl/database"
+	"signerflow-crl/services"
 )
 
 type CertificateHandler struct {

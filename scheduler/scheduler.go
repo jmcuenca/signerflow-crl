@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/robfig/cron/v3"
-	"github.com/signerflow/crl-service/services"
+	"signerflow-crl/services"
 )
 
 type Scheduler struct {

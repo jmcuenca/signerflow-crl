@@ -7,7 +7,7 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
-	"github.com/signerflow/crl-service/models"
+	"signerflow-crl/models"
 )
 
 type DB struct {

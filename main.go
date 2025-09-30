@@ -7,12 +7,12 @@ import (
 	"syscall"
 
 	"github.com/gin-gonic/gin"
-	"github.com/signerflow/crl-service/cache"
-	"github.com/signerflow/crl-service/config"
-	"github.com/signerflow/crl-service/database"
-	"github.com/signerflow/crl-service/handlers"
-	"github.com/signerflow/crl-service/scheduler"
-	"github.com/signerflow/crl-service/services"
+	"signerflow-crl/cache"
+	"signerflow-crl/config"
+	"signerflow-crl/database"
+	"signerflow-crl/handlers"
+	"signerflow-crl/scheduler"
+	"signerflow-crl/services"
 )
 
 func main() {
