@@ -4,15 +4,15 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"signerflow-crl-service/cache"
-	"signerflow-crl-service/config"
-	"signerflow-crl-service/database"
-	"signerflow-crl-service/handlers"
-	"signerflow-crl-service/scheduler"
-	"signerflow-crl-service/services"
 	"syscall"
 
 	"github.com/gin-gonic/gin"
+	"github.com/signerflow/crl-service/cache"
+	"github.com/signerflow/crl-service/config"
+	"github.com/signerflow/crl-service/database"
+	"github.com/signerflow/crl-service/handlers"
+	"github.com/signerflow/crl-service/scheduler"
+	"github.com/signerflow/crl-service/services"
 )
 
 func main() {

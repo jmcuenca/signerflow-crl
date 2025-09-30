@@ -1,4 +1,4 @@
-module signerflow-crl-service
+module github.com/signerflow/crl-service
 
 go 1.21
 

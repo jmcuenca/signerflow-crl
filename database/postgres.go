@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"signerflow-crl-service/models"
 	"time"
 
 	_ "github.com/lib/pq"
+	"github.com/signerflow/crl-service/models"
 )
 
 type DB struct {

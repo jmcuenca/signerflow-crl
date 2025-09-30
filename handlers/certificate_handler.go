@@ -2,13 +2,13 @@ package handlers
 
 import (
 	"net/http"
-	"signerflow-crl-service/cache"
-	"signerflow-crl-service/database"
-	"signerflow-crl-service/services"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/signerflow/crl-service/cache"
+	"github.com/signerflow/crl-service/database"
+	"github.com/signerflow/crl-service/services"
 )
 
 type CertificateHandler struct {

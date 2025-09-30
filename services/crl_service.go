@@ -11,11 +11,12 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"signerflow-crl-service/cache"
-	"signerflow-crl-service/database"
-	"signerflow-crl-service/models"
 	"sync"
 	"time"
+
+	"github.com/signerflow/crl-service/cache"
+	"github.com/signerflow/crl-service/database"
+	"github.com/signerflow/crl-service/models"
 )
 
 type CRLService struct {

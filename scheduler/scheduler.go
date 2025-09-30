@@ -2,9 +2,9 @@ package scheduler
 
 import (
 	"log"
-	"signerflow-crl-service/services"
 
 	"github.com/robfig/cron/v3"
+	"github.com/signerflow/crl-service/services"
 )
 
 type Scheduler struct {
