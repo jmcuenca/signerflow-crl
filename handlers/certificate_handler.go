@@ -6,6 +6,7 @@ import (
 	"signerflow-crl-service/database"
 	"signerflow-crl-service/services"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -76,7 +77,7 @@ func (h *CertificateHandler) ValidCertificate(c *gin.Context) {
 		return
 	}
 	if status.IsRevoked {
-		c.String(http.StatusOK, status.RevocationDate.Format("2006-01-02T15:04:05"))
+		c.String(http.StatusOK, status.RevocationDate.Format(time.RFC3339))
 	} else {
 		c.String(http.StatusOK, "")
 	}
