@@ -27,5 +27,10 @@
     "https://crl.letmi.app/LETMI_CA_SUB01.crl",
     "http://crl.appfirmas.com/crl/appfirmas/9dd7d200-d3f5-45d3-9de4-69446907163d.crl",
     "http://pcca1.online/crl/emisorCA1.crl",
-    "http://pcca2.online/crl/emisorCA1.crl"
+    "http://pcca2.online/crl/emisorCA1.crl",
+    "http://crl1.securitydata.net.ec/subca2crl1/crlfile.crl",
+    "http://crl2.securitydata.net.ec/subca2crl2/crlfile.crl",
+    "https://datil-subca-crl.s3.us-west-2.amazonaws.com/crl/a0788ee0-78bb-406b-b38a-32e36aa4dbdb.crl",
+    "https://datil-subca-crl.s3.us-west-2.amazonaws.com/crl/427ded95-4f2d-4277-958b-7269befa6582.crl",
+    "https://datil-subca-crl.s3.us-west-2.amazonaws.com/crl/b547a740-dc95-4cee-9572-4686cf3dee1e.crl"
     ]
