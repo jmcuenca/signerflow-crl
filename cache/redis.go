@@ -21,6 +21,17 @@ func NewRedisClient(redisURL, password string, db int) (*RedisClient, error) {
 		Addr:     redisURL,
 		Password: password,
 		DB:       db,
+		// Optimización del pool de conexiones
+		PoolSize:           20,              // Tamaño del pool de conexiones
+		MinIdleConns:       5,               // Mínimo de conexiones idle
+		MaxConnAge:         5 * time.Minute, // Edad máxima de una conexión
+		PoolTimeout:        4 * time.Second, // Timeout para obtener conexión del pool
+		IdleTimeout:        3 * time.Minute, // Tiempo antes de cerrar conexiones idle
+		IdleCheckFrequency: 1 * time.Minute, // Frecuencia de chequeo de conexiones idle
+		// Timeouts
+		DialTimeout:  5 * time.Second,
+		ReadTimeout:  3 * time.Second,
+		WriteTimeout: 3 * time.Second,
 	})
 
 	ctx := context.Background()
@@ -30,7 +41,7 @@ func NewRedisClient(redisURL, password string, db int) (*RedisClient, error) {
 		return nil, fmt.Errorf("error connecting to Redis: %v", err)
 	}
 
-	log.Println("Connected to Redis")
+	log.Println("Connected to Redis with optimized pool settings")
 	return &RedisClient{
 		client: rdb,
 		ctx:    ctx,

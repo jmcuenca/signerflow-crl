@@ -20,14 +20,29 @@ import (
 )
 
 type CRLService struct {
-	db    *database.DB
-	redis *cache.RedisClient
+	db         *database.DB
+	redis      *cache.RedisClient
+	httpClient *http.Client
 }
 
 func NewCRLService(db *database.DB, redis *cache.RedisClient) *CRLService {
+	// Crear HTTP client optimizado con pool de conexiones reutilizables
+	transport := &http.Transport{
+		MaxIdleConns:        100,              // Máximo de conexiones idle totales
+		MaxIdleConnsPerHost: 20,               // Máximo de conexiones idle por host
+		MaxConnsPerHost:     50,               // Máximo de conexiones por host
+		IdleConnTimeout:     90 * time.Second, // Timeout para conexiones idle
+		DisableCompression:  false,            // Habilitar compresión
+		DisableKeepAlives:   false,            // Mantener conexiones vivas
+	}
+
 	return &CRLService{
 		db:    db,
 		redis: redis,
+		httpClient: &http.Client{
+			Timeout:   30 * time.Second,
+			Transport: transport,
+		},
 	}
 }
 
@@ -129,6 +144,10 @@ func (s *CRLService) ProcessSingleCRL(crlURL string) error {
 		log.Printf("Error inserting CRL info: %v", err)
 	}
 
+	// Procesar certificados en batch para mejor rendimiento
+	batchSize := 500
+	certificates := make([]*models.RevokedCertificate, 0, batchSize)
+
 	processed := 0
 	for _, revokedCert := range crl.TBSCertList.RevokedCertificates {
 		serial := s.formatSerial(revokedCert.SerialNumber)
@@ -155,28 +174,63 @@ func (s *CRLService) ProcessSingleCRL(crlURL string) error {
 			CertificateAuthority: issuerNameStr,
 		}
 
-		err = s.db.InsertRevokedCertificate(revokedCertificate)
-		if err != nil {
-			log.Printf("Error inserting revoked certificate %s: %v", serial, err)
-			continue
-		}
+		certificates = append(certificates, revokedCertificate)
 
-		if s.redis != nil {
-			status := &models.CertificateStatus{
-				Serial:               serial,
-				IsRevoked:            true,
-				RevocationDate:       &revokedCert.RevocationTime,
-				Reason:               &reasonText,
-				CertificateAuthority: &issuerNameStr,
-			}
-
-			err = s.redis.SetCertificateStatus(serial, status, 24*time.Hour)
+		// Insertar en batch cuando se alcanza el tamaño del batch
+		if len(certificates) >= batchSize {
+			err = s.db.BatchInsertRevokedCertificates(certificates)
 			if err != nil {
-				log.Printf("Error caching certificate status for %s: %v", serial, err)
+				log.Printf("Error batch inserting certificates: %v", err)
+			} else {
+				processed += len(certificates)
 			}
+
+			// Cachear certificados en Redis
+			if s.redis != nil {
+				for _, cert := range certificates {
+					status := &models.CertificateStatus{
+						Serial:               cert.Serial,
+						IsRevoked:            true,
+						RevocationDate:       &cert.RevocationDate,
+						Reason:               &cert.ReasonText,
+						CertificateAuthority: &issuerNameStr,
+					}
+					err = s.redis.SetCertificateStatus(cert.Serial, status, 24*time.Hour)
+					if err != nil {
+						log.Printf("Error caching certificate status for %s: %v", cert.Serial, err)
+					}
+				}
+			}
+
+			certificates = make([]*models.RevokedCertificate, 0, batchSize)
+		}
+	}
+
+	// Insertar certificados restantes
+	if len(certificates) > 0 {
+		err = s.db.BatchInsertRevokedCertificates(certificates)
+		if err != nil {
+			log.Printf("Error batch inserting remaining certificates: %v", err)
+		} else {
+			processed += len(certificates)
 		}
 
-		processed++
+		// Cachear certificados restantes en Redis
+		if s.redis != nil {
+			for _, cert := range certificates {
+				status := &models.CertificateStatus{
+					Serial:               cert.Serial,
+					IsRevoked:            true,
+					RevocationDate:       &cert.RevocationDate,
+					Reason:               &cert.ReasonText,
+					CertificateAuthority: &issuerNameStr,
+				}
+				err = s.redis.SetCertificateStatus(cert.Serial, status, 24*time.Hour)
+				if err != nil {
+					log.Printf("Error caching certificate status for %s: %v", cert.Serial, err)
+				}
+			}
+		}
 	}
 
 	log.Printf("Successfully processed CRL %s: %d certificates processed", crlURL, processed)
@@ -189,18 +243,16 @@ func (s *CRLService) downloadCRL(crlURL string) ([]byte, error) {
 		return nil, fmt.Errorf("invalid URL: %v", err)
 	}
 
-	client := &http.Client{
-		Timeout: 30 * time.Second,
-	}
-
+	// Usar el cliente HTTP reutilizable con pool de conexiones
 	req, err := http.NewRequest("GET", parsedURL.String(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %v", err)
 	}
 
 	req.Header.Set("User-Agent", "SignerFlow-CRL-Service/1.0")
+	req.Header.Set("Accept-Encoding", "gzip, deflate")
 
-	resp, err := client.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error downloading CRL: %v", err)
 	}

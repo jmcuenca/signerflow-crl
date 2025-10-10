@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"signerflow-crl/cache"
 	"signerflow-crl/config"
@@ -69,6 +70,9 @@ func setupRouter(handler *handlers.CertificateHandler) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
+
+	// Usar compresión gzip para reducir tamaño de respuestas
+	router.Use(gzip.Gzip(gzip.DefaultCompression))
 
 	router.Use(func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")

@@ -54,3 +54,4 @@ docker-data/
 # Archivos de respaldo
 *.bak
 *.backup
+.claude
